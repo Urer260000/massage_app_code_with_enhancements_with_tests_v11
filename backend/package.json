@@ -1,0 +1,19 @@
+
+{
+  "name": "massage-app-backend",
+  "version": "1.0.0",
+  "description": "Backend for a Massage Booking App",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.6.10"
+  },
+  "devDependencies": {
+    "jest": "^27.1.0"
+  }
+}
