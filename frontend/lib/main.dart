@@ -66,6 +66,12 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+// Screen Tracking in initState
+@override
+void initState() {
+  super.initState();
+  ga.sendScreenView('HomeScreen');
+}
 
 class BookingScreen extends StatelessWidget {
   @override
