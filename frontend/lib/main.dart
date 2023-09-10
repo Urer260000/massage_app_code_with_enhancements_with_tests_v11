@@ -1,6 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+// Analytics Initialization
+import 'package:google_analytics/google_analytics.dart';
+final GoogleAnalytics ga = GoogleAnalytics(trackingId: 'YOUR_TRACKING_ID');
 
 void main() => runApp(MyApp());
 
