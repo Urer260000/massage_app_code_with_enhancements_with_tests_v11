@@ -45,7 +45,12 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(title: Text('Home')),
       body: Center(
         child: ElevatedButton(
-          onPressed: () {
+          onPressed: ()
+          // Event Tracking for Button Click
+onPressed: () {
+  ga.sendEvent('User Interaction', 'Button Click', label: 'Register Button');
+}
+{
             registerUser('username', 'email@example.com', 'password');
           },
           child: Text('Register'),
