@@ -26,7 +26,24 @@ app.post('/register', async (req, res) => {
         createdAt: new Date(),
         updatedAt: new Date()
     };
+var express = require('express');
+var app = express();
 
+// set up rate limiter: maximum of five requests per minute
+var RateLimit = require('express-rate-limit');
+var limiter = RateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // max 100 requests per windowMs
+});
+
+// apply rate limiter to all requests
+app.use(limiter);
+
+app.get('/:path', function(req, res) {
+  let path = req.params.path;
+  if (isValidPath(path))
+    res.sendFile(path);
+});
     await db.collection('users').insertOne(newUser);
 
     const token = jwt.sign({ userId: newUser._id }, 'yourSecretKey', { expiresIn: '1h' });
