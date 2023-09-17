@@ -7,7 +7,12 @@ const MongoClient = require('mongodb').MongoClient;
 const app = express();
 const port = 3000;
 
-const jwtSecret = process.env.JWT_SECRET || '9OSyS/zT+ReINiI28SWLB2BgAjrx03gEsqa2BpQpxp8';
+// Updated JWT secret retrieval from environment variables
+const jwtSecret = process.env.JWT_SECRET || '';
+if (!jwtSecret) {
+    console.error("Error: JWT_SECRET is not defined in environment variables.");
+    process.exit(1);
+}
 
 let client;
 
