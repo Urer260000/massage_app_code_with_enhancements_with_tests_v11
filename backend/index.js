@@ -7,7 +7,7 @@ const MongoClient = require('mongodb').MongoClient;
 const app = express();
 const port = 3000;
 
-const jwtSecret = process.env.JWT_SECRET || 'aMuchMoreComplexFallbackSecret';
+const jwtSecret = process.env.JWT_SECRET || '9OSyS/zT+ReINiI28SWLB2BgAjrx03gEsqa2BpQpxp8';
 
 let client;
 
