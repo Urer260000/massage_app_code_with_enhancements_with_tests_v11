@@ -1,8 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const MongoClient = require('mongodb').MongoClient;
 const app = express();
 const port = 3000;
+
+const jwtSecret = process.env.JWT_SECRET || 'fallbackSecret';
 
 let client;
 
@@ -26,27 +29,10 @@ app.post('/register', async (req, res) => {
         createdAt: new Date(),
         updatedAt: new Date()
     };
-var express = require('express');
-var app = express();
 
-// set up rate limiter: maximum of five requests per minute
-var RateLimit = require('express-rate-limit');
-var limiter = RateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // max 100 requests per windowMs
-});
-
-// apply rate limiter to all requests
-app.use(limiter);
-
-app.get('/:path', function(req, res) {
-  let path = req.params.path;
-  if (isValidPath(path))
-    res.sendFile(path);
-});
     await db.collection('users').insertOne(newUser);
 
-    const token = jwt.sign({ userId: newUser._id }, 'yourSecretKey', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: newUser._id }, jwtSecret, { expiresIn: '1h' });
     res.status(201).json({ message: 'User registered successfully', userId: newUser._id, token });
 });
 
@@ -73,7 +59,7 @@ async function verifyToken(req, res, next) {
     }
 
     try {
-        const decodedToken = await jwt.verify(token, 'yourSecretKey');
+        const decodedToken = await jwt.verify(token, jwtSecret);
         req.userId = decodedToken.userId;
         next();
     } catch (err) {
