@@ -2,7 +2,7 @@ name: your_project_name
 version: 1.0.0
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'  # Adjust the SDK version as needed
+  sdk: '>=3.1.0 <4.0.0'  # Adjust the SDK version as needed
 
 dependencies:
   flutter:
