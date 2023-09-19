@@ -118,7 +118,7 @@ https://flutter.dev/docs/testing/integration-tests#testing-on-firebase-test-lab
 
   @override
   ViewConfiguration createViewConfiguration() {
-    final FlutterView view = platformDispatcher.implicitView!;
+    final FlutterView view = platformDispatcher.implicitView;
     final double devicePixelRatio = view.devicePixelRatio;
     final Size size = _surfaceSize ?? view.physicalSize / devicePixelRatio;
     return TestViewConfiguration.fromView(

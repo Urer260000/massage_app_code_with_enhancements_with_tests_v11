@@ -34,7 +34,7 @@ void drawHelloWorld(ui.FlutterView view) {
 void main() async {
   // TODO(goderbauer): Create a window if embedder doesn't provide an implicit view to draw into.
   assert(ui.PlatformDispatcher.instance.implicitView != null);
-  final ui.FlutterView view = ui.PlatformDispatcher.instance.implicitView!;
+  final ui.FlutterView view = ui.PlatformDispatcher.instance.implicitView;
 
   // Create a completer to send the window visibility result back to the
   // integration test.
