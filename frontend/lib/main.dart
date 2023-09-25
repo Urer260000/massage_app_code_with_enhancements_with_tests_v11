@@ -1,9 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-// Analytics Initialization
 import 'package:google_analytics/google_analytics.dart';
-final GoogleAnalytics ga = GoogleAnalytics(trackingId: 'YOUR_TRACKING_ID');
+
+final GoogleAnalytics ga = GoogleAnalytics(trackingId: 'ACTUAL_TRACKING_ID');
 
 void main() => runApp(MyApp());
 
@@ -24,7 +23,7 @@ class MyApp extends StatelessWidget {
 class HomeScreen extends StatelessWidget {
   Future<void> registerUser(String username, String email, String password) async {
     final response = await http.post(
-      Uri.parse('http://your_backend_url/register'),
+      Uri.parse('http://actual_backend_url/register'),
       body: {
         'username': username,
         'email': email,
@@ -45,13 +44,9 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(title: Text('Home')),
       body: Center(
         child: ElevatedButton(
-          onPressed: ()
-          // Event Tracking for Button Click
-onPressed: () {
-  ga.sendEvent('User Interaction', 'Button Click', label: 'Register Button');
-}
-{
+          onPressed: () {
             registerUser('username', 'email@example.com', 'password');
+            ga.sendEvent('User Interaction', 'Button Click', label: 'Register Button');
           },
           child: Text('Register'),
         ),
@@ -59,6 +54,9 @@ onPressed: () {
     );
   }
 }
+
+// ... rest of your code
+
 
 class ProfileScreen extends StatelessWidget {
   @override
