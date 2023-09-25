@@ -7,8 +7,9 @@ const MongoClient = require('mongodb').MongoClient;
 const app = express();
 const port = 3000;
 
-// Updated JWT secret retrieval from environment variables
 const jwtSecret = process.env.JWT_SECRET || '';
+const dbUrl = process.env.MONGO_DB_URL || "mongodb://localhost:27017/mydatabase";
+
 if (!jwtSecret) {
     console.error("Error: JWT_SECRET is not defined in environment variables.");
     process.exit(1);
@@ -16,7 +17,7 @@ if (!jwtSecret) {
 
 let client;
 
-MongoClient.connect("mongodb://localhost:27017/mydatabase", { useUnifiedTopology: true }, async function (err, mongoClient) {
+MongoClient.connect(dbUrl, { useUnifiedTopology: true }, async function (err, mongoClient) {
     if (err) {
         console.error("Error occurred while connecting to MongoDB Atlas...\n", err);
         process.exit(1);
@@ -28,13 +29,13 @@ MongoClient.connect("mongodb://localhost:27017/mydatabase", { useUnifiedTopology
 });
 
 app.use(express.json());
-
-// Apply rate limiting middleware
 const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 15 * 60 * 1000,
     max: 100
 });
 app.use(apiLimiter);
+
+// ... rest of your code
 
 app.post('/register', async (req, res) => {
     try {
