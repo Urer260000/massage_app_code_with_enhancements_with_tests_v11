@@ -20,22 +20,47 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  Future<void> registerUser(String username, String email, String password) async {
-    final response = await http.post(
-      Uri.parse('http://actual_backend_url/register'),
-      body: {
-        'username': username,
-        'email': email,
-        'password': password,
-      },
-    );
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
 
-    if (response.statusCode == 201) {
-      // User registered successfully
-    } else {
-      // Handle error
+class _HomeScreenState extends State<HomeScreen> {
+  bool _isLoading = false;
+
+  Future<void> registerUser(String username, String email, String password) async {
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      final response = await http.post(
+        Uri.parse('http://actual_backend_url/register'),
+        body: {
+          'username': username,
+          'email': email,
+          'password': password,
+        },
+      );
+
+      if (response.statusCode == 201) {
+        // User registered successfully
+      } else {
+        // Handle error
+      }
+    } catch (e) {
+      // Handle exception
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ga.sendScreenView('HomeScreen');
   }
 
   @override
@@ -44,19 +69,16 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(title: Text('Home')),
       body: Center(
         child: ElevatedButton(
-          onPressed: () {
+          onPressed: _isLoading ? null : () {
             registerUser('username', 'email@example.com', 'password');
             ga.sendEvent('User Interaction', 'Button Click', label: 'Register Button');
           },
-          child: Text('Register'),
+          child: _isLoading ? CircularProgressIndicator() : Text('Register'),
         ),
       ),
     );
   }
 }
-
-// ... rest of your code
-
 
 class ProfileScreen extends StatelessWidget {
   @override
@@ -68,12 +90,6 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-}
-// Screen Tracking in initState
-@override
-void initState() {
-  super.initState();
-  ga.sendScreenView('HomeScreen');
 }
 
 class BookingScreen extends StatelessWidget {
