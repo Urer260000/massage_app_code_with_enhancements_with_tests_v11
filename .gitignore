@@ -1,0 +1,28 @@
+# Node
+node_modules/
+backend/.env
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+frontend/android/.gradle/
+frontend/android/local.properties
+frontend/android/app/debug/
+frontend/android/app/profile/
+frontend/android/app/release/
+frontend/ios/Pods/
+frontend/ios/Flutter/Generated.xcconfig
+frontend/ios/Flutter/flutter_export_environment.sh
+*.iml
+
+# IDEs / OS
+.idea/
+.vs/
+.vscode/
+.DS_Store
+Thumbs.db

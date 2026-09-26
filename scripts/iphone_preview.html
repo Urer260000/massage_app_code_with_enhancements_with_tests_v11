@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iPhone Preview</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+         justify-content: center; gap: 16px; background: #1d1f24; font-family: system-ui, sans-serif; color: #ddd; }
+  .phone { position: relative; width: 393px; height: 852px; border-radius: 56px; padding: 14px;
+           background: #0b0b0d; box-shadow: 0 0 0 2px #3a3a40, 0 30px 80px rgba(0,0,0,.6); }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 44px; overflow: hidden; background: #fff; }
+  .island { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 122px; height: 36px;
+            border-radius: 20px; background: #000; z-index: 2; pointer-events: none; }
+  iframe { border: 0; width: 100%; height: 100%; display: block; }
+  .bar { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+  select, button { font: inherit; padding: 4px 10px; border-radius: 8px; }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <select id="model">
+      <option value="393x852">iPhone 15 / 16</option>
+      <option value="430x932">iPhone 15 / 16 Pro Max</option>
+      <option value="375x667">iPhone SE</option>
+    </select>
+    <button onclick="document.getElementById('app').src = document.getElementById('app').src">Reload</button>
+  </div>
+  <div class="phone" id="phone">
+    <div class="screen"><div class="island"></div>
+      <iframe id="app" src="http://localhost:8080" title="Massage app"></iframe>
+    </div>
+  </div>
+<script>
+  document.getElementById('model').addEventListener('change', e => {
+    const [w, h] = e.target.value.split('x').map(Number);
+    const p = document.getElementById('phone');
+    p.style.width = (w + 28) + 'px'; p.style.height = (h + 28) + 'px';
+  });
+  document.getElementById('model').dispatchEvent(new Event('change'));
+</script>
+</body>
+</html>

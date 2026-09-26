@@ -1,93 +1,36 @@
 require('dotenv').config();
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const rateLimit = require('express-rate-limit');
-const MongoClient = require('mongodb').MongoClient;
-const app = express();
-const port = 3000;
+const crypto = require('crypto');
+const { createApp } = require('./app');
+const { createMemoryStore, createMongoStore } = require('./store');
 
-const jwtSecret = process.env.JWT_SECRET || '';
-const dbUrl = process.env.MONGO_DB_URL || "mongodb://localhost:27017/mydatabase";
+const port = Number(process.env.PORT) || 3000;
 
-if (!jwtSecret) {
-    console.error("Error: JWT_SECRET is not defined in environment variables.");
+async function start() {
+  let jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    jwtSecret = crypto.randomBytes(32).toString('hex');
+    console.warn('JWT_SECRET not set - using a random secret for this run (logins reset on restart).');
+  }
+
+  let store;
+  if (process.env.MONGO_DB_URL) {
+    store = await createMongoStore(process.env.MONGO_DB_URL);
+    console.log('Connected to MongoDB.');
+  } else {
+    store = createMemoryStore();
+    console.log('MONGO_DB_URL not set - using in-memory storage (data resets on restart).');
+  }
+
+  const app = createApp({ store, jwtSecret });
+  // Listen on all interfaces so the Android emulator (10.0.2.2) can reach it.
+  app.listen(port, '0.0.0.0', () => console.log(`Server running on http://localhost:${port}`));
+}
+
+if (require.main === module) {
+  start().catch((err) => {
+    console.error('Failed to start server:', err);
     process.exit(1);
+  });
 }
 
-let client;
-
-MongoClient.connect(dbUrl, { useUnifiedTopology: true }, async function (err, mongoClient) {
-    if (err) {
-        console.error("Error occurred while connecting to MongoDB Atlas...\n", err);
-        process.exit(1);
-    } else {
-        client = mongoClient;
-        console.log('Connected...');
-        db = await client.db();
-    }
-});
-
-app.use(express.json());
-const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100
-});
-app.use(apiLimiter);
-
-// ... rest of your code
-
-app.post('/register', async (req, res) => {
-    try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        const newUser = {
-            username: req.body.username,
-            email: req.body.email,
-            password: hashedPassword,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        };
-
-        await db.collection('users').insertOne(newUser);
-
-        const token = jwt.sign({ userId: newUser._id }, jwtSecret, { expiresIn: '1h' });
-        res.status(201).json({ message: 'User registered successfully', userId: newUser._id, token });
-    } catch (err) {
-        res.status(500).json({ message: 'An error occurred while registering the user.' });
-    }
-});
-
-app.get('/services', async (req, res) => {
-    try {
-        const services = await db.collection('services').find({}).toArray();
-        res.status(200).json({ services });
-    } catch (err) {
-        res.status(500).json({ message: 'An error occurred while fetching services.' });
-    }
-});
-
-// Add middleware to verify JWT tokens
-app.use(verifyToken);
-
-app.get('/protected', async (req, res) => {
-    // Only authenticated users can access this route
-});
-
-async function verifyToken(req, res, next) {
-    const token = req.header('Authorization');
-    if (!token) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-
-    try {
-        const decodedToken = await jwt.verify(token, jwtSecret);
-        req.userId = decodedToken.userId;
-        next();
-    } catch (err) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-}
-
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+module.exports = { start };

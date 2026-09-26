@@ -1,105 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:google_analytics/google_analytics.dart';
 
-final GoogleAnalytics ga = GoogleAnalytics(trackingId: 'ACTUAL_TRACKING_ID');
+import 'api.dart';
+import 'screens/auth_screen.dart';
+import 'screens/home_screen.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(MassageApp(api: ApiClient()));
 
-class MyApp extends StatelessWidget {
+class MassageApp extends StatefulWidget {
+  const MassageApp({super.key, required this.api});
+  final ApiClient api;
+
+  @override
+  State<MassageApp> createState() => _MassageAppState();
+}
+
+class _MassageAppState extends State<MassageApp> {
+  User? _user;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      routes: {
-        '/': (context) => HomeScreen(),
-        '/profile': (context) => ProfileScreen(),
-        '/booking': (context) => BookingScreen(),
-      },
-      initialRoute: '/',
-    );
-  }
-}
-
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  bool _isLoading = false;
-
-  Future<void> registerUser(String username, String email, String password) async {
-    setState(() {
-      _isLoading = true;
-    });
-    
-    try {
-      final response = await http.post(
-        Uri.parse('http://actual_backend_url/register'),
-        body: {
-          'username': username,
-          'email': email,
-          'password': password,
-        },
-      );
-
-      if (response.statusCode == 201) {
-        // User registered successfully
-      } else {
-        // Handle error
-      }
-    } catch (e) {
-      // Handle exception
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    ga.sendScreenView('HomeScreen');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Home')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: _isLoading ? null : () {
-            registerUser('username', 'email@example.com', 'password');
-            ga.sendEvent('User Interaction', 'Button Click', label: 'Register Button');
-          },
-          child: _isLoading ? CircularProgressIndicator() : Text('Register'),
-        ),
+      title: 'Massage Booking',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3F7F74)),
+        useMaterial3: true,
       ),
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Profile')),
-      body: Center(
-        child: Text('Profile Screen'),
-      ),
-    );
-  }
-}
-
-class BookingScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Booking')),
-      body: Center(
-        child: Text('Booking Screen'),
-      ),
+      home: _user == null
+          ? AuthScreen(
+              api: widget.api,
+              onSignedIn: (user) => setState(() => _user = user),
+            )
+          : HomeScreen(
+              api: widget.api,
+              user: _user!,
+              onSignOut: () {
+                widget.api.logout();
+                setState(() => _user = null);
+              },
+            ),
     );
   }
 }
