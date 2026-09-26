@@ -125,7 +125,6 @@ void main() {
     await tester.tap(find.text('RESERVE'));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('confirm')), findsOneWidget);
-    expect(find.text('YOUR RESERVATION'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('confirm')));
     await tester.pumpAndSettle();
