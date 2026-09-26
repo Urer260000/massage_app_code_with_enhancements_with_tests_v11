@@ -9,6 +9,7 @@ import 'package:massage_app/main.dart';
 
 /// Fake backend so widget tests don't need a server.
 MockClient fakeBackend() {
+  final booked = <Map<String, dynamic>>[];
   return MockClient((req) async {
     final json = {'Content-Type': 'application/json'};
     switch (req.url.path) {
@@ -38,7 +39,16 @@ MockClient fakeBackend() {
           headers: json,
         );
       case '/appointments':
-        return http.Response(jsonEncode({'appointments': []}), 200, headers: json);
+        if (req.method == 'POST') {
+          final body = jsonDecode(req.body) as Map<String, dynamic>;
+          booked.add({
+            'id': '${booked.length + 1}',
+            'serviceName': 'Swedish Massage',
+            'startsAt': body['startsAt'],
+          });
+          return http.Response(jsonEncode({'appointment': booked.last}), 201, headers: json);
+        }
+        return http.Response(jsonEncode({'appointments': booked}), 200, headers: json);
     }
     return http.Response('{}', 404);
   });
@@ -81,5 +91,24 @@ void main() {
     await tester.tap(find.byKey(const Key('submit')));
     await tester.pumpAndSettle();
     expect(find.text('Invalid email or password.'), findsOneWidget);
+  });
+
+  testWidgets('booking a service shows it under Bookings', (tester) async {
+    await tester.pumpWidget(MassageApp(api: api()));
+    await tester.enterText(find.byKey(const Key('username')), 'Jake');
+    await tester.enterText(find.byKey(const Key('email')), 'jake@example.com');
+    await tester.enterText(find.byKey(const Key('password')), 'secret123');
+    await tester.tap(find.byKey(const Key('submit')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Book'));
+    await tester.pumpAndSettle();
+    expect(find.text('Book appointment'), findsOneWidget);
+
+    await tester.tap(find.text('Confirm booking'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.text('My appointments'), findsOneWidget);
+    expect(find.text('Swedish Massage'), findsOneWidget);
   });
 }

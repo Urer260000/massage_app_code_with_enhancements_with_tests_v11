@@ -26,7 +26,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _refreshAppointments() {
-    setState(() => _appointments = widget.api.appointments());
+    // Block body: an arrow here would return the Future to setState, which Flutter rejects.
+    setState(() {
+      _appointments = widget.api.appointments();
+    });
   }
 
   Future<void> _book(Service service) async {
@@ -77,7 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
         if (snap.hasError) {
           return _ErrorView(
             message: snap.error.toString(),
-            onRetry: () => setState(() => _services = widget.api.services()),
+            onRetry: () => setState(() {
+              _services = widget.api.services();
+            }),
           );
         }
         final services = snap.data!;
