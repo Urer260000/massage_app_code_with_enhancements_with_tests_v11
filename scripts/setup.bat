@@ -1,11 +1,12 @@
 @echo off
-REM One-time setup: installs backend packages, generates Flutter platform folders, runs tests.
+title the20sspa - setup
+REM One-time setup: installs backend packages, generates Flutter platform folders, applies branding, runs tests.
 cd /d "%~dp0\..\backend"
 call npm install || goto :err
 call npm test || goto :err
 cd /d "%~dp0\..\frontend"
-call flutter create --platforms=android,ios,web --org com.massageapp --project-name massage_app . || goto :err
-powershell -NoProfile -Command "$m='android\app\src\main\AndroidManifest.xml'; $c=Get-Content $m -Raw; if($c -notmatch 'usesCleartextTraffic'){ $c=$c -replace '<application','<application android:usesCleartextTraffic=\"true\"'; if($c -notmatch 'android.permission.INTERNET'){ $c=$c -replace '(<manifest[^>]*>)','$1`n    <uses-permission android:name=\"android.permission.INTERNET\"/>' }; Set-Content $m $c }"
+call flutter create --platforms=android,ios,web --org com.the20sspa --project-name the20sspa . || goto :err
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0apply_branding.ps1"
 call flutter pub get || goto :err
 call flutter test || goto :err
 echo.

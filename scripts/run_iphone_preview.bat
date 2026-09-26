@@ -1,5 +1,5 @@
 @echo off
-title Massage app - iPhone preview
+title the20sspa - iPhone preview
 REM Starts the backend, serves the Flutter web build on port 8080, and opens it in an iPhone frame.
 start "" "%~dp0start_backend.bat"
 start "" "%~dp0iphone_preview.html"

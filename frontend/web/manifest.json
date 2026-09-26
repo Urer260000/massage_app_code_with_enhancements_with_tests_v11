@@ -1,11 +1,11 @@
 {
-    "name": "massage_app",
-    "short_name": "massage_app",
+    "name": "the20sspa",
+    "short_name": "the20sspa",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0E0D0B",
+    "theme_color": "#D4AF6A",
+    "description": "Book a Roaring Twenties spa treatment at the20sspa.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

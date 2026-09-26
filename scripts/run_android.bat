@@ -1,5 +1,5 @@
 @echo off
-title Massage app - Android
+title the20sspa - Android
 REM Starts the backend, boots the Android emulator, and runs the app on it.
 start "" "%~dp0start_backend.bat"
 cd /d "%~dp0\..\frontend"

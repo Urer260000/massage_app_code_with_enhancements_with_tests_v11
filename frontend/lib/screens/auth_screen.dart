@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../api.dart';
+import '../theme/deco.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key, required this.api, required this.onSignedIn});
@@ -47,97 +48,121 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  void _toggleMode() {
+    setState(() {
+      _isRegister = !_isRegister;
+      _error = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Icon(Icons.spa, size: 64, color: theme.colorScheme.primary),
-                    const SizedBox(height: 12),
-                    Text('Massage Booking',
-                        textAlign: TextAlign.center, style: theme.textTheme.headlineMedium),
-                    const SizedBox(height: 4),
-                    Text(_isRegister ? 'Create an account' : 'Welcome back',
-                        textAlign: TextAlign.center, style: theme.textTheme.bodyLarge),
-                    const SizedBox(height: 24),
-                    if (_isRegister) ...[
-                      TextFormField(
-                        key: const Key('username'),
-                        controller: _username,
-                        decoration: const InputDecoration(
-                            labelText: 'Name', border: OutlineInputBorder()),
-                        textInputAction: TextInputAction.next,
-                        validator: (v) =>
-                            (v == null || v.trim().isEmpty) ? 'Enter your name' : null,
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                    TextFormField(
-                      key: const Key('email'),
-                      controller: _email,
-                      decoration: const InputDecoration(
-                          labelText: 'Email', border: OutlineInputBorder()),
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      validator: (v) => (v == null || !v.contains('@') || !v.contains('.'))
-                          ? 'Enter a valid email'
-                          : null,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(painter: SunburstPainter(origin: const Alignment(0, -1.15), opacity: 0.1)),
+          ),
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const BrandMark(size: 104),
+                        const SizedBox(height: 32),
+                        DecoFrame(
+                          padding: const EdgeInsets.fromLTRB(22, 26, 22, 18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                _isRegister ? 'Become a member' : 'Welcome back',
+                                textAlign: TextAlign.center,
+                                style: Deco.heading(size: 28),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                _isRegister ? 'JOIN THE PARTY' : 'THE PARTY AWAITS',
+                                textAlign: TextAlign.center,
+                                style: Deco.label(size: 11, color: Deco.muted),
+                              ),
+                              const SizedBox(height: 24),
+                              if (_isRegister) ...[
+                                TextFormField(
+                                  key: const Key('username'),
+                                  controller: _username,
+                                  style: const TextStyle(color: Deco.cream, fontSize: 16),
+                                  decoration: decoInput('NAME', Icons.person_outline),
+                                  textInputAction: TextInputAction.next,
+                                  textCapitalization: TextCapitalization.words,
+                                  validator: (v) =>
+                                      (v == null || v.trim().isEmpty) ? 'Enter your name' : null,
+                                ),
+                                const SizedBox(height: 14),
+                              ],
+                              TextFormField(
+                                key: const Key('email'),
+                                controller: _email,
+                                style: const TextStyle(color: Deco.cream, fontSize: 16),
+                                decoration: decoInput('EMAIL', Icons.alternate_email),
+                                keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.next,
+                                validator: (v) => (v == null || !v.contains('@') || !v.contains('.'))
+                                    ? 'Enter a valid email'
+                                    : null,
+                              ),
+                              const SizedBox(height: 14),
+                              TextFormField(
+                                key: const Key('password'),
+                                controller: _password,
+                                style: const TextStyle(color: Deco.cream, fontSize: 16),
+                                decoration: decoInput('PASSWORD', Icons.lock_outline),
+                                obscureText: true,
+                                onFieldSubmitted: (_) => _submit(),
+                                validator: (v) =>
+                                    (v == null || v.length < 6) ? 'At least 6 characters' : null,
+                              ),
+                              if (_error != null) ...[
+                                const SizedBox(height: 14),
+                                Text(
+                                  _error!,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(color: Deco.danger, fontSize: 14),
+                                ),
+                              ],
+                              const SizedBox(height: 22),
+                              GoldButton(
+                                key: const Key('submit'),
+                                label: _isRegister ? 'BECOME A MEMBER' : 'LOG IN',
+                                loading: _loading,
+                                onPressed: _submit,
+                              ),
+                              const SizedBox(height: 6),
+                              TextButton(
+                                onPressed: _loading ? null : _toggleMode,
+                                style: TextButton.styleFrom(foregroundColor: Deco.gold),
+                                child: Text(
+                                  _isRegister ? 'Already a member? Log in' : 'New here? Become a member',
+                                  style: const TextStyle(fontSize: 15),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      key: const Key('password'),
-                      controller: _password,
-                      decoration: const InputDecoration(
-                          labelText: 'Password', border: OutlineInputBorder()),
-                      obscureText: true,
-                      onFieldSubmitted: (_) => _submit(),
-                      validator: (v) => (v == null || v.length < 6)
-                          ? 'At least 6 characters'
-                          : null,
-                    ),
-                    if (_error != null) ...[
-                      const SizedBox(height: 12),
-                      Text(_error!, style: TextStyle(color: theme.colorScheme.error)),
-                    ],
-                    const SizedBox(height: 20),
-                    FilledButton(
-                      key: const Key('submit'),
-                      onPressed: _loading ? null : _submit,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: _loading
-                            ? const SizedBox(
-                                height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                            : Text(_isRegister ? 'Register' : 'Log in'),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: _loading
-                          ? null
-                          : () => setState(() {
-                                _isRegister = !_isRegister;
-                                _error = null;
-                              }),
-                      child: Text(_isRegister
-                          ? 'Already have an account? Log in'
-                          : 'New here? Create an account'),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

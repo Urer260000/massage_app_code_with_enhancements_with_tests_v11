@@ -1,10 +1,38 @@
 const crypto = require('crypto');
 
 const DEFAULT_SERVICES = [
-  { id: 'swedish-60', name: 'Swedish Massage', durationMinutes: 60, price: 80 },
-  { id: 'deep-tissue-60', name: 'Deep Tissue Massage', durationMinutes: 60, price: 95 },
-  { id: 'hot-stone-90', name: 'Hot Stone Massage', durationMinutes: 90, price: 120 },
-  { id: 'sports-45', name: 'Sports Massage', durationMinutes: 45, price: 70 },
+  {
+    id: 'swedish-60',
+    signature: 'The Gatsby',
+    name: 'Swedish Massage',
+    durationMinutes: 60,
+    price: 80,
+    description: 'Long, flowing strokes that melt the week away. Smooth as a foxtrot and twice as relaxing.',
+  },
+  {
+    id: 'deep-tissue-60',
+    signature: 'The Speakeasy',
+    name: 'Deep Tissue Massage',
+    durationMinutes: 60,
+    price: 95,
+    description: 'Firm, focused pressure for the knots nobody talks about. What happens here stays here.',
+  },
+  {
+    id: 'hot-stone-90',
+    signature: 'The Jazz Age',
+    name: 'Hot Stone Massage',
+    durationMinutes: 90,
+    price: 120,
+    description: 'Warm basalt stones and a slow, easy rhythm for a deep and lingering calm.',
+  },
+  {
+    id: 'sports-45',
+    signature: 'The Charleston',
+    name: 'Sports Massage',
+    durationMinutes: 45,
+    price: 70,
+    description: 'A brisk, stretching treatment for dancers, athletes and anyone always on the move.',
+  },
 ];
 
 /**
@@ -50,8 +78,8 @@ async function createMongoStore(url) {
   const appointments = db.collection('appointments');
 
   await users.createIndex({ email: 1 }, { unique: true });
-  if ((await services.countDocuments()) === 0) {
-    await services.insertMany(DEFAULT_SERVICES.map((s) => ({ ...s })));
+  for (const service of DEFAULT_SERVICES) {
+    await services.updateOne({ id: service.id }, { $set: service }, { upsert: true });
   }
 
   const clean = (doc) => {

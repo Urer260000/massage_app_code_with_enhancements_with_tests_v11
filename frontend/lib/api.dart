@@ -43,17 +43,25 @@ class Service {
     required this.name,
     required this.durationMinutes,
     required this.price,
+    this.signature,
+    this.description,
   });
   final String id;
   final String name;
   final int durationMinutes;
   final num price;
 
+  /// House name for the treatment, e.g. "The Gatsby".
+  final String? signature;
+  final String? description;
+
   factory Service.fromJson(Map<String, dynamic> json) => Service(
         id: json['id'].toString(),
         name: json['name'] as String,
         durationMinutes: (json['durationMinutes'] as num).toInt(),
         price: json['price'] as num,
+        signature: json['signature'] as String?,
+        description: json['description'] as String?,
       );
 }
 

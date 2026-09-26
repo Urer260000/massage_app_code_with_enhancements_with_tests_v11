@@ -1,14 +1,14 @@
-# Massage app - Windows dev setup
+# the20sspa - Windows dev setup
 # Installs Git, Node.js LTS, JDK 17, Flutter and the Android SDK + a Pixel emulator,
 # clones the app, and runs its tests. Safe to re-run: finished steps are skipped.
 $ErrorActionPreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
 $src      = Join-Path $env:USERPROFILE 'source'
-$repoDir  = Join-Path $src 'massage_app'
+$repoDir  = Join-Path $src 'the20sspa'
 $flutter  = Join-Path $env:USERPROFILE 'flutter'
 $sdk      = Join-Path $env:LOCALAPPDATA 'Android\Sdk'
-$log      = Join-Path $src 'massage_setup_log.txt'
-$status   = Join-Path $src 'massage_setup_status.txt'
+$log      = Join-Path $src 'the20sspa_setup_log.txt'
+$status   = Join-Path $src 'the20sspa_setup_status.txt'
 Start-Transcript -Path $log -Force | Out-Null
 "RUNNING" | Set-Content $status
 
@@ -24,7 +24,7 @@ function Add-UserPath($p) {
   Refresh-Path
 }
 
-$accepted = Join-Path $src 'massage_setup_licenses_accepted.txt'
+$accepted = Join-Path $src 'the20sspa_setup_licenses_accepted.txt'
 if (-not (Test-Path $accepted)) {
 Write-Host @"
 This will install (from their official sources):
@@ -38,18 +38,6 @@ and accept the license agreements for these packages (including the Android SDK 
   "Accepted $(Get-Date)" | Set-Content $accepted
 } else { Write-Host "License terms already accepted earlier ($(Get-Content $accepted))." }
 
-
-# Tidy up: an earlier run accidentally generated a Flutter project directly in the source folder.
-$strayPub = Join-Path $src 'pubspec.yaml'
-if ((Test-Path $strayPub) -and (Test-Path (Join-Path $src '.metadata')) -and ((Get-Content $strayPub -Raw) -match 'name: massage_app')) {
-  $trash = Join-Path $src '_to_delete'
-  New-Item -ItemType Directory -Force $trash | Out-Null
-  foreach ($n in '.dart_tool','.gitignore','.idea','.metadata','analysis_options.yaml','android','build','ios','lib','massage_app.iml','pubspec.lock','pubspec.yaml','README.md','test','web') {
-    $p = Join-Path $src $n
-    if (Test-Path $p) { Move-Item $p $trash -Force }
-  }
-  Write-Host "Moved stray files from the earlier run into $trash"
-}
 
 function Download($url, $out) {
   Write-Host "Downloading $url"
@@ -138,7 +126,7 @@ if ($avds -notcontains 'Pixel_7_API_35') {
 Write-Host "Hardware acceleration check:"
 & (Join-Path $sdk 'emulator\emulator.exe') -accel-check
 
-Step "Massage app code"
+Step "the20sspa code"
 if (-not (Test-Path (Join-Path $repoDir '.git'))) {
   git clone -b fix/runnable-app https://github.com/Urer260000/massage_app_code_with_enhancements_with_tests_v11.git $repoDir
 } else {
@@ -158,16 +146,8 @@ Pop-Location
 
 Step "Frontend: platform folders + tests"
 Push-Location (Join-Path $repoDir 'frontend')
-flutter create --platforms=android,ios,web --org com.massageapp --project-name massage_app .
-$m = 'android\app\src\main\AndroidManifest.xml'
-$c = Get-Content $m -Raw
-if ($c -notmatch 'usesCleartextTraffic') {
-  $c = $c -replace '<application', '<application android:usesCleartextTraffic="true"'
-  if ($c -notmatch 'android.permission.INTERNET') {
-    $c = $c -replace '(<manifest[^>]*>)', "`$1`r`n    <uses-permission android:name=`"android.permission.INTERNET`"/>"
-  }
-  Set-Content $m $c -NoNewline
-}
+flutter create --platforms=android,ios,web --org com.the20sspa --project-name the20sspa .
+powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $repoDir 'scripts\apply_branding.ps1')
 flutter pub get
 flutter analyze
 flutter test

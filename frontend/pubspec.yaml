@@ -1,7 +1,7 @@
-name: massage_app
-description: Massage appointment booking app.
+name: the20sspa
+description: the20sspa — a Roaring Twenties day spa booking app.
 publish_to: 'none'
-version: 1.1.0+2
+version: 2.0.0+3
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -18,3 +18,13 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Limelight
+      fonts:
+        - asset: assets/fonts/Limelight-Regular.ttf
+    - family: PoiretOne
+      fonts:
+        - asset: assets/fonts/PoiretOne-Regular.ttf
+    - family: JosefinSans
+      fonts:
+        - asset: assets/fonts/JosefinSans-Variable.ttf

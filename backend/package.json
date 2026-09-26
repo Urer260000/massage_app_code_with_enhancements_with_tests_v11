@@ -1,7 +1,7 @@
 {
-  "name": "massage-app-backend",
+  "name": "the20sspa-backend",
   "version": "1.1.0",
-  "description": "Backend for a Massage Booking App",
+  "description": "Booking API for the20sspa, a Roaring Twenties day spa",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

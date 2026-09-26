@@ -3,29 +3,28 @@ import 'package:flutter/material.dart';
 import 'api.dart';
 import 'screens/auth_screen.dart';
 import 'screens/home_screen.dart';
+import 'theme/deco.dart';
 
-void main() => runApp(MassageApp(api: ApiClient()));
+void main() => runApp(SpaApp(api: ApiClient()));
 
-class MassageApp extends StatefulWidget {
-  const MassageApp({super.key, required this.api});
+/// the20sspa — a Roaring Twenties day spa.
+class SpaApp extends StatefulWidget {
+  const SpaApp({super.key, required this.api});
   final ApiClient api;
 
   @override
-  State<MassageApp> createState() => _MassageAppState();
+  State<SpaApp> createState() => _SpaAppState();
 }
 
-class _MassageAppState extends State<MassageApp> {
+class _SpaAppState extends State<SpaApp> {
   User? _user;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Massage Booking',
+      title: 'the20sspa',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3F7F74)),
-        useMaterial3: true,
-      ),
+      theme: buildDecoTheme(),
       home: _user == null
           ? AuthScreen(
               api: widget.api,
