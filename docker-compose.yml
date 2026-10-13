@@ -1,0 +1,27 @@
+# Runs the API with MongoDB: docker compose up --build
+services:
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      retries: 5
+
+  api:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_DB_URL: mongodb://mongo:27017/the20sspa
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET (python backend/generateSecretKey.py prints one)}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@the20sspa.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD for the staff login}
+      SPA_TIMEZONE: ${SPA_TIMEZONE:-America/New_York}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mongo-data:

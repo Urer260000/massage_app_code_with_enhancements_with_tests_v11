@@ -17,7 +17,7 @@ const list = (value) =>
 function systemTimezone() {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-  } catch (err) {
+  } catch {
     return 'UTC';
   }
 }

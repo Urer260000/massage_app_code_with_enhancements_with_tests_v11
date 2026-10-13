@@ -740,7 +740,6 @@ function createApp({
   app.use((req, res) => res.status(404).json({ message: 'Not found.' }));
 
   // One place that turns errors into `{ message }` responses.
-  // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
     if (err instanceof HttpError) return res.status(err.status).json({ message: err.message, ...err.extra });
     if (err instanceof ConflictError) return res.status(409).json({ message: err.message });
