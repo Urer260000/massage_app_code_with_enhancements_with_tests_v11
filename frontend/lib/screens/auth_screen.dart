@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../api.dart';
 import '../theme/deco.dart';
+import 'forgot_password_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key, required this.api, required this.onSignedIn});
@@ -46,6 +47,15 @@ class _AuthScreenState extends State<AuthScreen> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<void> _forgotPassword() async {
+    final user = await Navigator.of(context).push<User>(
+      MaterialPageRoute(
+        builder: (_) => ForgotPasswordScreen(api: widget.api, initialEmail: _email.text.trim()),
+      ),
+    );
+    if (user != null && mounted) widget.onSignedIn(user);
   }
 
   void _toggleMode() {
@@ -101,8 +111,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                   decoration: decoInput('NAME', Icons.person_outline),
                                   textInputAction: TextInputAction.next,
                                   textCapitalization: TextCapitalization.words,
-                                  validator: (v) =>
-                                      (v == null || v.trim().isEmpty) ? 'Enter your name' : null,
+                                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter your name' : null,
                                 ),
                                 const SizedBox(height: 14),
                               ],
@@ -112,10 +121,10 @@ class _AuthScreenState extends State<AuthScreen> {
                                 style: const TextStyle(color: Deco.cream, fontSize: 16),
                                 decoration: decoInput('EMAIL', Icons.alternate_email),
                                 keyboardType: TextInputType.emailAddress,
+                                autofillHints: const [AutofillHints.email],
                                 textInputAction: TextInputAction.next,
-                                validator: (v) => (v == null || !v.contains('@') || !v.contains('.'))
-                                    ? 'Enter a valid email'
-                                    : null,
+                                validator: (v) =>
+                                    (v == null || !v.contains('@') || !v.contains('.')) ? 'Enter a valid email' : null,
                               ),
                               const SizedBox(height: 14),
                               TextFormField(
@@ -125,9 +134,23 @@ class _AuthScreenState extends State<AuthScreen> {
                                 decoration: decoInput('PASSWORD', Icons.lock_outline),
                                 obscureText: true,
                                 onFieldSubmitted: (_) => _submit(),
-                                validator: (v) =>
-                                    (v == null || v.length < 6) ? 'At least 6 characters' : null,
+                                autofillHints: [_isRegister ? AutofillHints.newPassword : AutofillHints.password],
+                                validator: (v) {
+                                  if (v == null || v.isEmpty) return 'Enter your password';
+                                  // Only new passwords need the length rule; older accounts may be shorter.
+                                  return _isRegister && v.length < 8 ? 'At least 8 characters' : null;
+                                },
                               ),
+                              if (!_isRegister)
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    key: const Key('forgot'),
+                                    onPressed: _loading ? null : _forgotPassword,
+                                    style: TextButton.styleFrom(foregroundColor: Deco.muted),
+                                    child: const Text('Forgot password?'),
+                                  ),
+                                ),
                               if (_error != null) ...[
                                 const SizedBox(height: 14),
                                 Text(

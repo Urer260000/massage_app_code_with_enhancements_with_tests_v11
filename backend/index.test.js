@@ -250,8 +250,8 @@ describe('menu, team and availability', () => {
   it('marks past and too-soon slots on today as unavailable', async () => {
     const res = await request(makeApp()).get('/availability?serviceId=swedish-60&date=2030-01-07');
     const slot = (t) => res.body.slots.find((s) => s.time === t);
-    expect(slot('10:00').available).toBe(false); // now
-    expect(slot('10:30').available).toBe(true); // 30 minutes' notice
+    expect(slot('10:00')).toMatchObject({ available: false, past: true }); // now
+    expect(slot('10:30')).toMatchObject({ available: true, past: false }); // 30 minutes' notice
   });
 
   it('shows the booking window day by day', async () => {
@@ -511,6 +511,15 @@ describe('staff', () => {
     expect(res.statusCode).toBe(201);
     const slots = await request(app).get('/availability?serviceId=deep-tissue-60&date=2030-01-08&therapistId=louis');
     expect(slots.body.slots.every((s) => !s.available)).toBe(true);
+  });
+
+  it('accepts a spa-local date and time for blocks', async () => {
+    const { app, staff } = await setup();
+    const res = await request(app).post('/admin/blocks').set('Authorization', staff.auth).send({ therapistId: 'zelda', date: '2030-01-09', time: '13:00', durationMinutes: 60 });
+    expect(res.statusCode).toBe(201);
+    expect(res.body.appointment).toMatchObject({ localDate: '2030-01-09', localTime: '13:00', kind: 'block' });
+    const missing = await request(app).post('/admin/blocks').set('Authorization', staff.auth).send({ therapistId: 'zelda', durationMinutes: 60 });
+    expect(missing.statusCode).toBe(400);
   });
 
   it('edits prices, and hidden treatments drop off the menu', async () => {

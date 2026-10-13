@@ -63,12 +63,17 @@ const schemas = {
   }),
   waitlist: z.object({ serviceId: z.string().min(1).max(64), date: day }),
   adminStatus: z.object({ status: z.enum(['confirmed', 'completed', 'no_show', 'cancelled']) }),
-  adminBlock: z.object({
-    therapistId: z.string().min(1).max(64),
-    startsAt: isoDate,
-    durationMinutes: z.number().int().min(15).max(12 * 60),
-    reason: z.string().trim().max(120).optional(),
-  }),
+  // Either an exact startsAt, or a spa-local date and time (what the staff screen sends).
+  adminBlock: z
+    .object({
+      therapistId: z.string().min(1).max(64),
+      startsAt: isoDate.optional(),
+      date: day.optional(),
+      time: z.string().regex(/^\d{2}:\d{2}$/, 'time must look like HH:mm.').optional(),
+      durationMinutes: z.number().int().min(15).max(12 * 60),
+      reason: z.string().trim().max(120).optional(),
+    })
+    .refine((b) => b.startsAt || (b.date && b.time), 'startsAt (or date and time) is required.'),
   adminService: z
     .object({
       name: z.string().trim().min(1).max(80),
@@ -285,10 +290,13 @@ function createApp({
     return schedule.candidateStarts(dayDT, service.durationMinutes, spa).map((t) => {
       const keys = schedule.blocksFor(t.toJSDate(), service.durationMinutes, spa);
       const free = team.filter((th) => keys.every((k) => !busy.has(`${th.id}|${k}`)));
+      const open = schedule.withinWindow(t, spa, now());
       return {
         time: t.toFormat('HH:mm'),
         startsAt: t.toUTC().toISO(),
-        available: free.length > 0 && schedule.withinWindow(t, spa, now()),
+        available: free.length > 0 && open,
+        // Too soon (or already gone): apps can hide these rather than show them as taken.
+        past: !open,
         therapistIds: free.map((th) => th.id),
       };
     });
@@ -689,7 +697,10 @@ function createApp({
     const input = parse(schemas.adminBlock, req.body);
     const therapist = (await store.listTherapists()).find((t) => t.id === input.therapistId);
     if (!therapist) throw new HttpError(400, 'Unknown therapist.');
-    const start = DateTime.fromISO(new Date(input.startsAt).toISOString(), { zone: 'utc' });
+    const start = input.startsAt
+      ? DateTime.fromISO(new Date(input.startsAt).toISOString(), { zone: 'utc' })
+      : DateTime.fromISO(`${input.date}T${input.time}`, { zone: spa.timezone }).toUTC();
+    if (!start.isValid) throw new HttpError(400, 'That date or time is not valid.');
     if (start.setZone(spa.timezone).minute % spa.slotMinutes !== 0) {
       throw new HttpError(400, `Blocks must start on a ${spa.slotMinutes}-minute boundary.`);
     }

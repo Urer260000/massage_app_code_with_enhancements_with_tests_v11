@@ -11,7 +11,11 @@ const { sendReminders } = require('./reminders');
 const env = process.env;
 const production = env.NODE_ENV === 'production';
 const port = Number(env.PORT) || 3000;
-const logger = pino({ level: env.LOG_LEVEL || 'info' });
+// JSON logs in production (for log tools); readable, coloured lines locally.
+const logger = pino({
+  level: env.LOG_LEVEL || 'info',
+  ...(production ? {} : { transport: { target: 'pino-pretty', options: { ignore: 'pid,hostname', translateTime: 'HH:MM:ss' } } }),
+});
 
 /** In local (in-memory) mode, create a staff account so the Staff screen can be tried. */
 async function seedDemoAdmin(store) {

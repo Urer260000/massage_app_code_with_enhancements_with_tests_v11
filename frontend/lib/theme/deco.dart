@@ -27,18 +27,17 @@ class Deco {
 
   /// Small, wide-tracked uppercase label (menus, captions, buttons).
   static TextStyle label({double size = 12, Color color = gold}) => TextStyle(
-        fontFamily: body,
-        fontSize: size,
-        letterSpacing: 2.4,
-        color: color,
-        fontVariations: const [FontVariation('wght', 600)],
-      );
+    fontFamily: body,
+    fontSize: size,
+    letterSpacing: 2.4,
+    color: color,
+    fontVariations: const [FontVariation('wght', 600)],
+  );
 
   static TextStyle heading({double size = 26, Color color = cream}) =>
       TextStyle(fontFamily: elegant, fontSize: size, color: color, height: 1.15);
 
-  static TextStyle price({double size = 22}) =>
-      TextStyle(fontFamily: display, fontSize: size, color: goldBright);
+  static TextStyle price({double size = 22}) => TextStyle(fontFamily: display, fontSize: size, color: goldBright);
 }
 
 ThemeData buildDecoTheme() {
@@ -59,11 +58,7 @@ ThemeData buildDecoTheme() {
     scaffoldBackgroundColor: Deco.ink,
   );
   return base.copyWith(
-    textTheme: base.textTheme.apply(
-      bodyColor: Deco.cream,
-      displayColor: Deco.cream,
-      fontFamily: Deco.body,
-    ),
+    textTheme: base.textTheme.apply(bodyColor: Deco.cream, displayColor: Deco.cream, fontFamily: Deco.body),
     appBarTheme: const AppBarTheme(
       backgroundColor: Deco.ink,
       foregroundColor: Deco.gold,
@@ -91,15 +86,10 @@ ThemeData buildDecoTheme() {
       surfaceTintColor: Colors.transparent,
       indicatorColor: Deco.gold.withValues(alpha: 0.16),
       labelTextStyle: WidgetStateProperty.resolveWith(
-        (states) => Deco.label(
-          size: 11,
-          color: states.contains(WidgetState.selected) ? Deco.gold : Deco.muted,
-        ),
+        (states) => Deco.label(size: 11, color: states.contains(WidgetState.selected) ? Deco.gold : Deco.muted),
       ),
       iconTheme: WidgetStateProperty.resolveWith(
-        (states) => IconThemeData(
-          color: states.contains(WidgetState.selected) ? Deco.gold : Deco.muted,
-        ),
+        (states) => IconThemeData(color: states.contains(WidgetState.selected) ? Deco.gold : Deco.muted),
       ),
     ),
   );
@@ -137,12 +127,7 @@ InputDecoration decoInput(String label, IconData icon) {
 
 /// Primary call-to-action: a gold-leaf gradient bar.
 class GoldButton extends StatelessWidget {
-  const GoldButton({
-    super.key,
-    required this.label,
-    required this.onPressed,
-    this.loading = false,
-  });
+  const GoldButton({super.key, required this.label, required this.onPressed, this.loading = false});
 
   final String label;
   final VoidCallback? onPressed;
@@ -156,13 +141,7 @@ class GoldButton extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           gradient: Deco.goldGradient,
-          boxShadow: [
-            BoxShadow(
-              color: Deco.gold.withValues(alpha: 0.28),
-              blurRadius: 22,
-              offset: const Offset(0, 8),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: Deco.gold.withValues(alpha: 0.28), blurRadius: 22, offset: const Offset(0, 8))],
         ),
         child: Material(
           type: MaterialType.transparency,
@@ -218,17 +197,15 @@ class DecoDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget line(bool reverse) => Expanded(
-          child: Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: reverse
-                    ? const [Deco.gold, Color(0x00D4AF6A)]
-                    : const [Color(0x00D4AF6A), Deco.gold],
-              ),
-            ),
+      child: Container(
+        height: 1,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: reverse ? const [Deco.gold, Color(0x00D4AF6A)] : const [Color(0x00D4AF6A), Deco.gold],
           ),
-        );
+        ),
+      ),
+    );
     return SizedBox(
       width: width,
       child: Row(
@@ -267,12 +244,7 @@ class SectionTitle extends StatelessWidget {
 
 /// Panel with chamfered corners and a double gold rule.
 class DecoFrame extends StatelessWidget {
-  const DecoFrame({
-    super.key,
-    required this.child,
-    this.padding = const EdgeInsets.all(18),
-    this.highlight = false,
-  });
+  const DecoFrame({super.key, required this.child, this.padding = const EdgeInsets.all(18), this.highlight = false});
 
   final Widget child;
   final EdgeInsets padding;
@@ -373,8 +345,11 @@ class FanEmblem extends StatelessWidget {
   final double size;
 
   @override
-  Widget build(BuildContext context) =>
-      SizedBox(width: size, height: size * 0.72, child: CustomPaint(painter: _FanPainter()));
+  Widget build(BuildContext context) => SizedBox(
+    width: size,
+    height: size * 0.72,
+    child: CustomPaint(painter: _FanPainter()),
+  );
 }
 
 class _FanPainter extends CustomPainter {
@@ -422,7 +397,11 @@ class GoldText extends StatelessWidget {
     return ShaderMask(
       blendMode: BlendMode.srcIn,
       shaderCallback: (bounds) => Deco.goldGradient.createShader(bounds),
-      child: Text(text, style: style.copyWith(color: Colors.white), textAlign: textAlign),
+      child: Text(
+        text,
+        style: style.copyWith(color: Colors.white),
+        textAlign: textAlign,
+      ),
     );
   }
 }
