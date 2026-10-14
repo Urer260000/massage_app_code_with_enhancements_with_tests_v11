@@ -20,7 +20,7 @@ jobs:
       # Runs the store tests against real MongoDB as well as the in-memory store.
       MONGO_TEST_URL: mongodb://localhost:27017/spa_test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -36,7 +36,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           # Pinned so a new Flutter release can't break the build unannounced.
@@ -52,5 +52,5 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: docker build -t the20sspa-backend backend
