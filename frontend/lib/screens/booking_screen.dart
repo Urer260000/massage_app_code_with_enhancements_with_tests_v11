@@ -43,6 +43,8 @@ class _BookingScreenState extends State<BookingScreen> {
   void initState() {
     super.initState();
     _therapistId = widget.rescheduling?.therapistId;
+    // Rescheduling starts on the reservation's own day, usually the nearest alternative.
+    _day = widget.rescheduling?.localDate;
     _loadTherapists();
     _loadDays();
   }

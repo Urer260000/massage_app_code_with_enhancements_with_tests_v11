@@ -62,7 +62,7 @@ class FakeBackend {
     'therapistId': body['therapistId'] ?? 'evelyn',
     'therapistName': body['therapistId'] == 'zelda' ? 'Zelda' : 'Evelyn',
     'startsAt': body['startsAt'],
-    'localDate': '2030-01-08',
+    'localDate': '2030-01-09',
     'localTime': (body['startsAt'] as String).contains('T16') ? '11:00' : '10:00',
     'status': 'confirmed',
     'isPast': false,
@@ -321,6 +321,11 @@ void main() {
     await tester.tap(find.byKey(const Key('reschedule-1')));
     await tester.pumpAndSettle();
     expect(find.text('RESCHEDULE'), findsOneWidget);
+    // Opens on the reservation's day (Jan 9), not the first open day.
+    final selectedDay = find.byWidgetPredicate(
+      (w) => w is Semantics && w.properties.selected == true && w.properties.label == 'Wednesday, January 9, 2030',
+    );
+    expect(selectedDay, findsOneWidget);
     await tester.tap(find.byKey(const Key('slot-11:00')));
     await tester.tap(find.byKey(const Key('confirm')));
     await tester.pumpAndSettle();
